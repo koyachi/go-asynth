@@ -13,5 +13,5 @@ func main() {
 		z := math.Sin(2.0 * math.Pi * t * freq / 2)
 		return x*0.6 + y*0.2 + z*0.2
 	})
-	s.Play()
+	s.Play(nil)
 }

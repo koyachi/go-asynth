@@ -97,7 +97,12 @@ func (a *Asynth) initBaudio(fn func(Note, float64) float64) *baudio.B {
 	return b
 }
 
-func (a *Asynth) Play() {
+func (a *Asynth) Play(opts map[string]string) {
 	// TODO opts for b.play
-	a.b.Play(nil)
+	if opts == nil {
+		opts = map[string]string{
+			"buffer": "80",
+		}
+	}
+	a.b.Play(opts)
 }
