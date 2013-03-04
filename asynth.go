@@ -23,11 +23,26 @@ type Asynth struct {
 
 func New(fn func(note Note, t float64) float64) *Asynth {
 	a := &Asynth{
-		now: 0.0,
+		notes: []*Note{},
+		now:   0.0,
 	}
 	a.initCoreMidi()
 	a.b = a.initBaudio(fn)
 	return a
+}
+
+func isNoteOn(value byte) bool {
+	if value&0xF0 == 0x90 {
+		return true
+	}
+	return false
+}
+
+func isNoteOff(value byte) bool {
+	if value&0xF0 == 0x80 {
+		return true
+	}
+	return false
 }
 
 func (a *Asynth) initCoreMidi() {
@@ -44,15 +59,15 @@ func (a *Asynth) initCoreMidi() {
 	port, err := coremidi.NewInputPort(client, "test", func(source coremidi.Source, value []byte) {
 		fmt.Printf("source: %v, manufacturer: %v, value: %v\n", source.Name(), source.Manufacturer(), value)
 		note := value[1]
-		if value[2] == 0 {
+		if value[2] == 0 || isNoteOff(value[0]) {
 			i := 0
 			for i = 0; i < len(a.notes) && a.notes[i].Key != note; i++ {
 			}
-			if len(a.notes) >= i {
+			if len(a.notes) > i {
 				a.notes[i].Up = a.now
 			}
 		} else {
-			a.notes = append(a.notes, &Note{Key: note, Down: a.now})
+			a.notes = append(a.notes, &Note{Key: note, Start: 0.0, Elapsed: 0.0, Up: 0.0, Down: a.now})
 		}
 		return
 	})
