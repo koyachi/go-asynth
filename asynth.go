@@ -83,7 +83,7 @@ func (a *Asynth) initCoreMidi() {
 }
 
 func (a *Asynth) initBaudio(fn func(Note, float64) float64) *baudio.B {
-	opt := baudio.NewBOptions()
+	opt := baudio.NewAudioBufferOption()
 	opt.Size = 16
 	opt.Rate = 44000
 	b := baudio.New(opt, nil)
@@ -115,7 +115,7 @@ func (a *Asynth) initBaudio(fn func(Note, float64) float64) *baudio.B {
 func (a *Asynth) Play(opts map[string]string) {
 	// TODO opts for b.play
 	if opts == nil {
-		opts = map[string]string{
+		opts = baudio.RuntimeOption{
 			"buffer": "80",
 		}
 	}
